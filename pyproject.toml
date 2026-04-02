@@ -1,0 +1,8 @@
+[project]
+name = "genai-starter-kit"
+version = "0.0.1"
+description = "⚡️ Fast-track your GenAI app development"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
