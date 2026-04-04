@@ -1,0 +1,14 @@
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/python:3.13
+    volumes:
+      - ../:/workspaces/logmask-ai:cached
+    networks:
+      - logmask-ai
+    depends_on:
+      - presidio-analyzer
+      - presidio-anonymizer
+    command: sleep infinity
+
+networks:
+  logmask-ai:

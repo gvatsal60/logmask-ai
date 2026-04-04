@@ -1,7 +1,7 @@
 [project]
-name = "genai-starter-kit"
+name = "logmask-ai"
 version = "0.0.1"
-description = "⚡️ Fast-track your GenAI app development"
+description = ""
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
