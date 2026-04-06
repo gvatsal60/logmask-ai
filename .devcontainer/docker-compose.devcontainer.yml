@@ -9,6 +9,5 @@ services:
       - presidio-analyzer
       - presidio-anonymizer
     command: sleep infinity
-
 networks:
   logmask-ai:
