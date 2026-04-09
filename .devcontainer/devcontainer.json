@@ -65,11 +65,11 @@
     "docker-compose.devcontainer.yml",
     "../docker-compose.yml"
   ],
-  "service": "devcontainer",
+  "postCreateCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh && ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh",
   "runServices": [
     "presidio-analyzer",
     "presidio-anonymizer"
   ],
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "postCreateCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh && ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh"
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
 }
