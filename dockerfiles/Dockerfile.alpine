@@ -1,0 +1,12 @@
+FROM ghcr.io/astral-sh/uv:python3.12-alpine AS base
+
+# Metadata indicating the maintainer of this Dockerfile
+LABEL MAINTAINER="gvatsal60"
+
+# Install dependencies
+RUN apk update && apk add --no-cache \
+  alpine-sdk \
+  libsndfile
+
+RUN uv pip install --system spacy \
+  && uv run python -m spacy download en_core_web_sm

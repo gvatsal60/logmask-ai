@@ -1,4 +1,7 @@
 {
+  "build": {
+    "dockerfile": "../dockerfiles/Dockerfile.alpine"
+  },
   "capAdd": [
     "SYS_PTRACE"
   ],
@@ -61,15 +64,8 @@
       }
     }
   },
-  "dockerComposeFile": [
-    "docker-compose.devcontainer.yml",
-    "../docker-compose.yml"
-  ],
-  "service": "devcontainer",
-  "runServices": [
-    "presidio-analyzer",
-    "presidio-anonymizer"
-  ],
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "postCreateCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh && ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh"
+  "runArgs": [
+    "--rm",
+    "--name=vsc-${localEnv:USER}-${containerWorkspaceFolderBasename}-${devcontainerId}"
+  ]
 }

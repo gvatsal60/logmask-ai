@@ -1,7 +1,7 @@
 #***************************************************************************************
 # * File: Makefile
 # * Author: Vatsal Gupta
-# * Date: 26-Sep-2025
+# * Date: 04-Apr-2026
 # * Description: Makefile for managing the GenAI application.
 # **************************************************************************************/
 
@@ -14,7 +14,8 @@
 #***************************************************************************************
 # * Variables
 # **************************************************************************************/
-SRC_DIR := src
+TOP_DIR := $(shell git rev-parse --show-toplevel)
+SRC_DIR := "$(TOP_DIR)/src"
 
 #***************************************************************************************
 # * Targets
@@ -23,12 +24,22 @@ SRC_DIR := src
 
 all: sync run
 
+add:
+	@if [ -z "$(pkg)" ]; then \
+		echo "❌ Usage: make $@ pkg=\"package_name\"\n"; \
+		exit 1; \
+	fi
+	@uv add --no-cache $(pkg)
+
 sync:
-	@uv sync
+	@uv sync --no-cache
+
+debug: sync
+	@uv run streamlit run "$(SRC_DIR)/app.py" --server.runOnSave true
+
 run: sync
-	@uv run --directory $(SRC_DIR) streamlit run app.py --browser.gatherUsageStats false
-test: sync
-	@echo "No tests available currently."
-# 	@uv test
+	@uv run streamlit run "$(SRC_DIR)/app.py"
+
 clean:
 	@uv clean
+	@rm -rf .venv __pycache__ .mypy_cache
