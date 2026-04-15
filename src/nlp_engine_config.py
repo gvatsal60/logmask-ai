@@ -96,7 +96,9 @@ def create_nlp_engine_with_transformers(
     would return NlpArtifacts such as POS and lemmas.
     :param model_path: HuggingFace model path.
     """
-    print(f"Loading Transformers model: {model_path} of type {type(model_path)}")
+    logger.debug(
+        "Loading Transformers model: %s of type %s", model_path, type(model_path)
+    )
 
     nlp_configuration = {
         'nlp_engine_name': 'transformers',
