@@ -97,7 +97,7 @@ def create_nlp_engine_with_transformers(
     :param model_path: HuggingFace model path.
     """
     logger.debug(
-        "Loading Transformers model: %s of type %s", model_path, type(model_path)
+        'Loading Transformers model: %s of type %s', model_path, type(model_path)
     )
 
     nlp_configuration = {
