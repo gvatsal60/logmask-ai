@@ -24,7 +24,7 @@ from nlp_engine_config import (
     create_nlp_engine_with_stanza,
 )
 
-logger = logging.getLogger("presidio-streamlit")
+logger = logging.getLogger('presidio-streamlit')
 
 
 @st.cache_resource
@@ -49,11 +49,11 @@ def nlp_engine_and_registry(
     """
 
     # Set up NLP Engine according to the model of choice
-    if "spacy" in model_family.lower():
+    if 'spacy' in model_family.lower():
         return create_nlp_engine_with_spacy(model_path)
-    if "stanza" in model_family.lower():
+    if 'stanza' in model_family.lower():
         return create_nlp_engine_with_stanza(model_path)
-    elif "huggingface" in model_family.lower():
+    elif 'huggingface' in model_family.lower():
         return create_nlp_engine_with_transformers(model_path)
     else:
         raise ValueError(f"Model family {model_family} not supported")
@@ -99,7 +99,7 @@ def get_supported_entities(
     """Return supported entities from the Analyzer Engine."""
     return analyzer_engine(
         model_family, model_path, ta_key, ta_endpoint
-    ).get_supported_entities() + ["GENERIC_PII"]
+    ).get_supported_entities() + ['GENERIC_PII']
 
 
 @st.cache_data
@@ -107,22 +107,22 @@ def analyze(
     model_family: str, model_path: str, ta_key: str, ta_endpoint: str, **kwargs
 ):
     """Analyze input using Analyzer engine and input arguments (kwargs)."""
-    if "entities" not in kwargs or "All" in kwargs["entities"]:
-        kwargs["entities"] = None
+    if 'entities' not in kwargs or 'All' in kwargs['entities']:
+        kwargs['entities'] = None
 
-    if "deny_list" in kwargs and kwargs["deny_list"] is not None:
+    if 'deny_list' in kwargs and kwargs['deny_list'] is not None:
         ad_hoc_recognizer = create_ad_hoc_deny_list_recognizer(
-            kwargs["deny_list"])
-        kwargs["ad_hoc_recognizers"] = [
+            kwargs['deny_list'])
+        kwargs['ad_hoc_recognizers'] = [
             ad_hoc_recognizer] if ad_hoc_recognizer else []
-        del kwargs["deny_list"]
+        del kwargs['deny_list']
 
-    if "regex_params" in kwargs and len(kwargs["regex_params"]) > 0:
+    if 'regex_params' in kwargs and len(kwargs['regex_params']) > 0:
         ad_hoc_recognizer = create_ad_hoc_regex_recognizer(
-            *kwargs["regex_params"])
-        kwargs["ad_hoc_recognizers"] = [
+            *kwargs['regex_params'])
+        kwargs['ad_hoc_recognizers'] = [
             ad_hoc_recognizer] if ad_hoc_recognizer else []
-        del kwargs["regex_params"]
+        del kwargs['regex_params']
 
     return analyzer_engine(model_family, model_path, ta_key, ta_endpoint).analyze(
         **kwargs
@@ -146,32 +146,32 @@ def anonymize(
     :param analyze_results: list of results from presidio analyzer engine
     """
 
-    if operator == "mask":
+    if operator == 'mask':
         operator_config = {
-            "type": "mask",
-            "masking_char": mask_char,
-            "chars_to_mask": number_of_chars,
-            "from_end": False,
+            'type': 'mask',
+            'masking_char': mask_char,
+            'chars_to_mask': number_of_chars,
+            'from_end': False,
         }
 
     # Define operator config
-    elif operator == "encrypt":
-        operator_config = {"key": encrypt_key}
-    elif operator == "highlight":
-        operator_config = {"lambda": lambda x: x}
+    elif operator == 'encrypt':
+        operator_config = {'key': encrypt_key}
+    elif operator == 'highlight':
+        operator_config = {'lambda': lambda x: x}
     else:
         operator_config = None
 
     # Change operator if needed as intermediate step
-    if operator == "highlight":
-        operator = "custom"
-    elif operator == "synthesize":
-        operator = "replace"
+    if operator == 'highlight':
+        operator = 'custom'
+    elif operator == 'synthesize':
+        operator = 'replace'
 
     res = anonymizer_engine().anonymize(
         text,
         analyze_results,
-        operators={"DEFAULT": OperatorConfig(operator, operator_config)},
+        operators={'DEFAULT': OperatorConfig(operator, operator_config)},
     )
     return res
 
@@ -186,7 +186,7 @@ def annotate(text: str, analyze_results: List[RecognizerResult]):
     # Use the anonymizer to resolve overlaps
     results = anonymize(
         text=text,
-        operator="highlight",
+        operator='highlight',
         analyze_results=analyze_results,
     )
 
@@ -221,7 +221,7 @@ def create_ad_hoc_deny_list_recognizer(
         return None
 
     deny_list_recognizer = PatternRecognizer(
-        supported_entity="GENERIC_PII", deny_list=deny_list
+        supported_entity='GENERIC_PII', deny_list=deny_list
     )
     return deny_list_recognizer
 
@@ -239,7 +239,7 @@ def create_ad_hoc_regex_recognizer(
     """
     if not regex:
         return None
-    pattern = Pattern(name="Regex pattern", regex=regex, score=score)
+    pattern = Pattern(name='Regex pattern', regex=regex, score=score)
     regex_recognizer = PatternRecognizer(
         supported_entity=entity_type, patterns=[pattern], context=context
     )
