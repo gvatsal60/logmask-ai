@@ -7,13 +7,11 @@ services:
       - GRPC_PORT=5001
     networks:
       - logmask-ai
-
   presidio-anonymizer:
     image: mcr.microsoft.com/presidio-anonymizer:latest
     ports:
       - "5001:3000"
     networks:
       - logmask-ai
-
 networks:
   logmask-ai:

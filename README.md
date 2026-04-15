@@ -64,8 +64,8 @@ uv run python main.py --analyze --model ollama/tinyllama --api-base http://local
 
 ```bash
 uv run python main.py \
-	--presidio-analyzer-url http://localhost:5002/analyze \
-	--presidio-anonymizer-url http://localhost:5001/anonymize
+ --presidio-analyzer-url http://localhost:5002/analyze \
+ --presidio-anonymizer-url http://localhost:5001/anonymize
 ```
 
 ## Notes
