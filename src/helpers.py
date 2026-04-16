@@ -1,5 +1,5 @@
 """
-Helper methods for the Presidio Streamlit app
+Helper methods for the app
 """
 
 from typing import List, Optional, Tuple

@@ -9,7 +9,7 @@ toolbarMode = "minimal"
 showErrorDetails = "full"
 
 [server]
-headless = false
+headless = true
 
 [browser]
 gatherUsageStats = false

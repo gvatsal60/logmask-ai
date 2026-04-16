@@ -34,7 +34,7 @@ add:
 sync:
 	@uv sync --no-cache --all-extras
 
-debug: sync
+debug:
 	@uv run streamlit run "$(SRC_DIR)/app.py" --server.runOnSave true
 
 run: sync

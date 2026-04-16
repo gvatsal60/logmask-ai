@@ -1,12 +1,11 @@
-"""Streamlit app for Presidio."""
+"""Streamlit app for logmask-ai"""
 import logging
-import os
 import traceback
+from urllib.parse import quote
 
 import dotenv
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 from annotated_text import annotated_text
 from streamlit_tags import st_tags
 
@@ -22,47 +21,34 @@ st.set_page_config(
     page_title='LogMask-AI',
     layout='wide',
     initial_sidebar_state='expanded',
-    # menu_items={
-    #     "About": "https://microsoft.github.io/presidio/",
-    # },
 )
 
 dotenv.load_dotenv()
-logger = logging.getLogger('presidio-streamlit')
-
-
-allow_other_models = os.getenv('ALLOW_OTHER_MODELS', False)
-
+logger = logging.getLogger('logmask-ai')
 
 # Sidebar
-st.sidebar.header("""
-PII De-Identification with [Microsoft Presidio](https://microsoft.github.io/presidio/)
-""")
+st.sidebar.header("LogMask-AI")
 
-
-model_help_text = """
+MODEL_HELP_TXT = """
     Select which Named Entity Recognition (NER) model to use for PII detection, in parallel to rule-based recognizers.
-    Presidio supports multiple NER packages off-the-shelf, such as spaCy, Huggingface, and Stanza,
-    as well as service such as Azure Text Analytics PII.
-    """
-st_ta_key = st_ta_endpoint = ''
+    It supports multiple NER packages off-the-shelf, such as spaCy, Huggingface, and Stanza.
+"""
+
+ST_TA_KEY = ST_TA_ENDPOINT = ''
 
 model_list = [
     'spaCy/en_core_web_lg',
-    'HuggingFace/obi/deid_roberta_i2b2',
-    'HuggingFace/StanfordAIMI/stanford-deidentifier-base',
-    'stanza/en',
-    'Other',
+    # 'HuggingFace/obi/deid_roberta_i2b2',
+    # 'HuggingFace/StanfordAIMI/stanford-deidentifier-base',
+    # 'stanza/en',
 ]
 
-if not allow_other_models:
-    model_list.pop()
 # Select model
 st_model = st.sidebar.selectbox(
     'NER model package',
     model_list,
-    index=1,
-    help=model_help_text,
+    index=0,
+    help=MODEL_HELP_TXT,
 )
 
 # Extract model package.
@@ -81,20 +67,9 @@ if st_model == 'Other':
     )
     st_model = st.sidebar.text_input(label='NER model name', value='')
 
-if st_model == 'Azure AI Language':
-    st_ta_key = st.sidebar.text_input(
-        label='Azure AI Language key', value=os.getenv('TA_KEY', ''), type='password'
-    )
-    st_ta_endpoint = st.sidebar.text_input(
-        label='Azure AI Language endpoint',
-        value=os.getenv('TA_ENDPOINT', default=''),
-        help='For more info: https://learn.microsoft.com/en-us/azure/cognitive-services/language-service/personally-identifiable-information/overview',  # noqa: E501
-    )
-
-
 st.sidebar.warning('Note: Models might take some time to download. ')
 
-analyzer_params = (st_model_package, st_model, st_ta_key, st_ta_endpoint)
+analyzer_params = (st_model_package, st_model, ST_TA_KEY, ST_TA_ENDPOINT)
 logger.debug('analyzer_params: {analyzer_params}')
 
 st_operator = st.sidebar.selectbox(
@@ -111,25 +86,23 @@ st_operator = st.sidebar.selectbox(
     - Mask: Replaces a requested number of characters with an asterisk (or other mask character)\n
     - Hash: Replaces with the hash of the PII string\n
     - Encrypt: Replaces with an AES encryption of the PII string, allowing the process to be reversed
-         """,
+    """,
 )
-st_mask_char = '*'
-st_number_of_chars = 15
-st_encrypt_key = 'WmZq4t7w!z%C&F)J'
-
-open_ai_params = None
+ST_MASK_CHAR = '*'
+ST_NUM_OF_CHARS = 15
+ST_ENCRYPT_KEY = 'WmZq4t7w!z%C&F)J'
 
 logger.debug(f"st_operator: {st_operator}")
 
 if st_operator == 'mask':
-    st_number_of_chars = st.sidebar.number_input(
-        'number of chars', value=st_number_of_chars, min_value=0, max_value=100
+    ST_NUM_OF_CHARS = st.sidebar.number_input(
+        'number of chars', value=ST_NUM_OF_CHARS, min_value=0, max_value=100
     )
-    st_mask_char = st.sidebar.text_input(
-        'Mask character', value=st_mask_char, max_chars=1
+    ST_MASK_CHAR = st.sidebar.text_input(
+        'Mask character', value=ST_MASK_CHAR, max_chars=1
     )
 elif st_operator == 'encrypt':
-    st_encrypt_key = st.sidebar.text_input('AES key', value=st_encrypt_key)
+    ST_ENCRYPT_KEY = st.sidebar.text_input('AES key', value=ST_ENCRYPT_KEY)
 
 st_threshold = st.sidebar.slider(
     label='Acceptance threshold',
@@ -142,8 +115,7 @@ st_threshold = st.sidebar.slider(
 st_return_decision_process = st.sidebar.checkbox(
     'Add analysis explanations to findings',
     value=False,
-    help='Add the decision process to the output table. '
-    'More information can be found here: https://microsoft.github.io/presidio/analyzer/decision_process/',
+    help="""Add the decision process to the output table.""",
 )
 
 # Allow and deny lists
@@ -166,9 +138,9 @@ with st_deny_allow_expander:
     st.caption(
         'Denylists contain words that are considered PII, but are not detected as such.'
     )
-# Main panel
 
-analyzer_load_state = st.info('Starting Presidio analyzer...')
+# Main panel
+analyzer_load_state = st.info('Starting logmask analyzer...')
 
 analyzer_load_state.empty()
 
@@ -193,12 +165,11 @@ try:
         options=get_supported_entities(*analyzer_params),
         default=list(get_supported_entities(*analyzer_params)),
         help='Limit the list of PII entities detected. '
-        'This list is dynamic and based on the NER model and registered recognizers. '
-        'More information can be found here: https://microsoft.github.io/presidio/analyzer/adding_recognizers/',
+        'This list is dynamic and based on the NER model and registered recognizers. ',
     )
 
     # Before
-    analyzer_load_state = st.info('Starting Presidio analyzer...')
+    analyzer_load_state = st.info('Starting logmask analyzer...')
     analyzer = analyzer_engine(*analyzer_params)
     analyzer_load_state.empty()
 
@@ -220,9 +191,9 @@ try:
             st_anonymize_results = anonymize(
                 text=st_text,
                 operator=st_operator,
-                mask_char=st_mask_char,
-                number_of_chars=st_number_of_chars,
-                encrypt_key=st_encrypt_key,
+                mask_char=ST_MASK_CHAR,
+                number_of_chars=ST_NUM_OF_CHARS,
+                encrypt_key=ST_ENCRYPT_KEY,
                 analyze_results=st_analyze_results,
             )
             st.text_area(
@@ -265,7 +236,7 @@ try:
             )
             df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
         st.dataframe(df_subset.reset_index(
-            drop=True), use_container_width=True)
+            drop=True), width=True)
     else:
         st.text('No findings')
 
@@ -274,14 +245,16 @@ except Exception as e:
     traceback.print_exc()
     st.error(e)
 
-components.html(
-    """
-    <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "h7f8bp42n8");
-    </script>
-    """
+CLARITY_HTML = """
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "h7f8bp42n8");
+</script>
+"""
+
+st.iframe(
+    src=f"data:text/html;charset=utf-8,{quote(CLARITY_HTML)}",
 )
