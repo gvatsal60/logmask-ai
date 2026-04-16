@@ -8,7 +8,7 @@ tags:
 - genai
 - python
 pinned: false
-short_description:
+short_description: AI-Powered Generic Log Anonymization
 license: apache-2.0
 ---
 
