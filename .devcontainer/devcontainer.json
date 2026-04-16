@@ -61,15 +61,10 @@
       }
     }
   },
-  "dockerComposeFile": [
-    "docker-compose.devcontainer.yml",
-    "../docker-compose.yml"
-  ],
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
   "postCreateCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh && ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh",
-  "runServices": [
-    "presidio-analyzer",
-    "presidio-anonymizer"
-  ],
-  "service": "devcontainer",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+  "runArgs": [
+    "--rm",
+    "--name=vsc-${localEnv:USER}-${containerWorkspaceFolderBasename}-${devcontainerId}"
+  ]
 }

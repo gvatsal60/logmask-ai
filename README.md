@@ -1,3 +1,18 @@
+---
+title: logmask-ai
+sdk: docker
+python_version: 3.12
+app_port: 8501
+tags:
+- streamlit
+- genai
+- python
+pinned: false
+short_description:
+license: apache-2.0
+---
+
+<!-- markdownlint-disable MD025 -->
 # Log Masking and Analysis App
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/gvatsal60/logmask-ai/blob/HEAD/LICENSE)
