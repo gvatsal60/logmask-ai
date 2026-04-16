@@ -52,9 +52,9 @@ USER nonroot
 COPY pyproject.toml ./
 
 # Install dependencies into a local folder
-RUN uv sync --no-cache \
-  && uv pip install --no-cache spacy \
-  && uv run python -m spacy download en_core_web_sm
+RUN uv sync --no-cache
+RUN uv add --no-cache spacy
+RUN uv run python -m spacy download en_core_web_sm
 
 # Copy source code
 COPY src/ ./
