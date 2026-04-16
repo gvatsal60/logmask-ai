@@ -37,8 +37,10 @@ WORKDIR /app
 
 # Set cache directory to /tmp to avoid permission issues
 ENV XDG_CACHE_HOME=/tmp/.cache
-RUN mkdir -p XDG_CACHE_HOME \
-  && chmod -R 777 XDG_CACHE_HOME
+RUN mkdir -p /tmp/.cache/uv \
+  && chmod -R 777 /tmp/.cache/uv
+
+ENV UV_CACHE_DIR=/app
 
 # ##########################################################################
 # Copy Files
@@ -48,7 +50,7 @@ COPY pyproject.toml ./
 
 # Install dependencies into a local folder
 RUN uv sync --no-cache \
-  && uv pip install spacy \
+  && uv pip install --no-cache spacy \
   && uv run python -m spacy download en_core_web_sm
 
 # Copy source code
