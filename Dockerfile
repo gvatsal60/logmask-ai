@@ -37,11 +37,6 @@ WORKDIR /app
 
 # Set cache directory to /tmp to avoid permission issues
 ENV XDG_CACHE_HOME=/tmp/.cache
-RUN mkdir -p /tmp/.cache/uv \
-  && chmod -R 777 /tmp/.cache/uv
-
-# Switch to non-root user
-USER nonroot
 
 # ##########################################################################
 # Copy Files
@@ -50,8 +45,7 @@ USER nonroot
 COPY pyproject.toml ./
 
 # Install dependencies into a local folder
-RUN uv sync --no-cache
-RUN uv run python -m spacy download en_core_web_sm
+RUN uv sync --no-cache --all-extras
 
 # Copy source code
 COPY src/ ./
@@ -64,6 +58,8 @@ EXPOSE 8501
 # ##########################################################################
 # Command to Run
 # ##########################################################################
+# Switch to non-root user
+USER nonroot
 
 ENTRYPOINT [ "uv", "run", \
   "streamlit", "run", "app.py", \

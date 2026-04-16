@@ -32,7 +32,7 @@ add:
 	@uv add --no-cache $(pkg)
 
 sync:
-	@uv sync --no-cache
+	@uv sync --no-cache --all-extras
 
 debug: sync
 	@uv run streamlit run "$(SRC_DIR)/app.py" --server.runOnSave true
