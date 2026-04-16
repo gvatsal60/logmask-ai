@@ -37,6 +37,8 @@ WORKDIR /app
 
 # Set cache directory to /tmp to avoid permission issues
 ENV XDG_CACHE_HOME=/tmp/.cache
+RUN mkdir -p XDG_CACHE_HOME \
+  && chmod -R 777 XDG_CACHE_HOME
 
 # ##########################################################################
 # Copy Files
