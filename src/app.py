@@ -168,36 +168,6 @@ with st_deny_allow_expander:
     )
 # Main panel
 
-with st.expander('About this demo', expanded=False):
-    st.info(
-        """Presidio is an open source customizable framework for PII detection and de-identification.
-        \n\n[Code](https://aka.ms/presidio) |
-        [Tutorial](https://microsoft.github.io/presidio/tutorial/) |
-        [Installation](https://microsoft.github.io/presidio/installation/) |
-        [FAQ](https://microsoft.github.io/presidio/faq/) |
-        [Feedback](https://forms.office.com/r/9ufyYjfDaY) |"""
-    )
-
-    st.info(
-        """
-    Use this demo to:
-    - Experiment with different off-the-shelf models and NLP packages.
-    - Explore the different de-identification options, including redaction, masking, encryption and more.
-    - Generate synthetic text with Microsoft Presidio and OpenAI.
-    - Configure allow and deny lists.
-
-    This demo website shows some of Presidio's capabilities.
-    [Visit our website](https://microsoft.github.io/presidio) for more info,
-    samples and deployment options.
-    """
-    )
-
-    st.markdown(
-        '[![Pypi Downloads](https://img.shields.io/pypi/dm/presidio-analyzer.svg)](https://img.shields.io/pypi/dm/presidio-analyzer.svg)'  # noqa
-        '[![MIT license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)'
-        '![GitHub Repo stars](https://img.shields.io/github/stars/microsoft/presidio?style=social)'
-    )
-
 analyzer_load_state = st.info('Starting Presidio analyzer...')
 
 analyzer_load_state.empty()

@@ -1,7 +1,4 @@
 {
-  "build": {
-    "dockerfile": "../dockerfiles/Dockerfile.alpine"
-  },
   "capAdd": [
     "SYS_PTRACE"
   ],
@@ -64,6 +61,8 @@
       }
     }
   },
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "postCreateCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh && ${containerWorkspaceFolder}/.devcontainer/postCreateScript.sh",
   "runArgs": [
     "--rm",
     "--name=vsc-${localEnv:USER}-${containerWorkspaceFolderBasename}-${devcontainerId}"
