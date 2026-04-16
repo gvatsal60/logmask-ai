@@ -40,8 +40,6 @@ ENV XDG_CACHE_HOME=/tmp/.cache
 RUN mkdir -p /tmp/.cache/uv \
   && chmod -R 777 /tmp/.cache/uv
 
-ENV UV_CACHE_DIR=/app
-
 # Switch to non-root user
 USER nonroot
 
@@ -52,7 +50,7 @@ USER nonroot
 COPY pyproject.toml ./
 
 # Install dependencies into a local folder
-RUN uv sync --no-cache
+RUN uv sync --frozen --no-cache
 RUN uv add --no-cache spacy
 RUN uv run python -m spacy download en_core_web_sm
 
