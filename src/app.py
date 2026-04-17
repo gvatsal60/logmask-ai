@@ -24,7 +24,7 @@ st.set_page_config(
 logger = logging.getLogger('logmask-ai')
 
 # Sidebar
-st.sidebar.header("LogMask-AI")
+st.sidebar.header('LogMask-AI')
 
 MODEL_HELP_TXT = """
     Select which Named Entity Recognition (NER) model to use for PII detection, in parallel to rule-based recognizers.
@@ -89,7 +89,7 @@ ST_MASK_CHAR = '*'
 ST_NUM_OF_CHARS = 15
 ST_ENCRYPT_KEY = 'WmZq4t7w!z%C&F)J'
 
-logger.debug("st_operator: %s", st_operator)
+logger.debug('st_operator: %s', st_operator)
 
 if st_operator == 'mask':
     ST_NUM_OF_CHARS = st.sidebar.number_input(
@@ -216,27 +216,27 @@ try:
 
     # table result
     st.subheader(
-        "Findings"
+        'Findings'
         if not st_return_decision_process
-        else "Findings with decision factors"
+        else 'Findings with decision factors'
     )
     if st_analyze_results:
         df = pd.DataFrame.from_records(
             [r.to_dict() for r in st_analyze_results])
-        df["text"] = [st_text[res.start: res.end]
+        df['text'] = [st_text[res.start: res.end]
                       for res in st_analyze_results]
 
-        df_subset = df[["entity_type", "text", "start", "end", "score"]].rename(
+        df_subset = df[['entity_type', 'text', 'start', 'end', 'score']].rename(
             {
-                "entity_type": "Entity type",
-                "text": "Text",
-                "start": "Start",
-                "end": "End",
-                "score": "Confidence",
+                'entity_type': 'Entity type',
+                'text': 'Text',
+                'start': 'Start',
+                'end': 'End',
+                'score': 'Confidence',
             },
             axis=1,
         )
-        df_subset["Text"] = [st_text[res.start: res.end]
+        df_subset['Text'] = [st_text[res.start: res.end]
                              for res in st_analyze_results]
         if st_return_decision_process:
             analysis_explanation_df = pd.DataFrame.from_records(
@@ -244,9 +244,9 @@ try:
             )
             df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
         st.dataframe(df_subset.reset_index(
-            drop=True), width="stretch")
+            drop=True), width='stretch')
     else:
-        st.text("No findings")
+        st.text('No findings')
 
 except Exception as e:
     print(e)
