@@ -40,6 +40,10 @@ debug:
 run: sync
 	@uv run streamlit run "$(SRC_DIR)/app.py"
 
+test:
+	@echo "Running tests..."
+	@uv run python -m pytest
+
 clean:
 	@uv clean
 	@rm -rf .venv __pycache__ .mypy_cache
