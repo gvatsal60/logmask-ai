@@ -1,9 +1,7 @@
 """Streamlit app for logmask-ai"""
 import logging
 import traceback
-from urllib.parse import quote
 
-import dotenv
 import pandas as pd
 import streamlit as st
 from annotated_text import annotated_text
@@ -23,11 +21,10 @@ st.set_page_config(
     initial_sidebar_state='expanded',
 )
 
-dotenv.load_dotenv()
 logger = logging.getLogger('logmask-ai')
 
 # Sidebar
-st.sidebar.header("LogMask-AI")
+st.sidebar.header('LogMask-AI')
 
 MODEL_HELP_TXT = """
     Select which Named Entity Recognition (NER) model to use for PII detection, in parallel to rule-based recognizers.
@@ -38,9 +35,9 @@ ST_TA_KEY = ST_TA_ENDPOINT = ''
 
 model_list = [
     'spaCy/en_core_web_lg',
+    # 'stanza/en',
     # 'HuggingFace/obi/deid_roberta_i2b2',
     # 'HuggingFace/StanfordAIMI/stanford-deidentifier-base',
-    # 'stanza/en',
 ]
 
 # Select model
@@ -92,7 +89,7 @@ ST_MASK_CHAR = '*'
 ST_NUM_OF_CHARS = 15
 ST_ENCRYPT_KEY = 'WmZq4t7w!z%C&F)J'
 
-logger.debug(f"st_operator: {st_operator}")
+logger.debug('st_operator: %s', st_operator)
 
 if st_operator == 'mask':
     ST_NUM_OF_CHARS = st.sidebar.number_input(
@@ -247,7 +244,7 @@ try:
             )
             df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
         st.dataframe(df_subset.reset_index(
-            drop=True), width=True)
+            drop=True))
     else:
         st.text('No findings')
 
@@ -255,17 +252,3 @@ except Exception as e:
     print(e)
     traceback.print_exc()
     st.error(e)
-
-CLARITY_HTML = """
-<script type="text/javascript">
-(function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, "clarity", "script", "h7f8bp42n8");
-</script>
-"""
-
-st.iframe(
-    src=f"data:text/html;charset=utf-8,{quote(CLARITY_HTML)}",
-)

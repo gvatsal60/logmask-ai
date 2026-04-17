@@ -20,7 +20,7 @@ SRC_DIR := $(TOP_DIR)/src
 #***************************************************************************************
 # * Targets
 # **************************************************************************************/
-.PHONY: all run clean
+.PHONY: all run test clean
 
 all: sync run
 
@@ -39,6 +39,10 @@ debug:
 
 run: sync
 	@uv run streamlit run "$(SRC_DIR)/app.py"
+
+test:
+	@echo "Running tests..."
+	@uv run python -m pytest
 
 clean:
 	@uv clean

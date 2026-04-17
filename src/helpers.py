@@ -2,7 +2,7 @@
 Helper methods for the app
 """
 
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 import logging
 
 from presidio_analyzer import (
@@ -134,7 +134,7 @@ def anonymize(
     operator: str,
     analyze_results: List[RecognizerResult],
     mask_char: Optional[str] = None,
-    number_of_chars: Optional[str] = None,
+    number_of_chars: Optional[int] = None,
     encrypt_key: Optional[str] = None,
 ):
     """Anonymize identified input using Presidio Anonymizer.
@@ -145,6 +145,8 @@ def anonymize(
     :param encrypt_key: Encryption key (for encrypt operator)
     :param analyze_results: list of results from presidio analyzer engine
     """
+
+    operator_config: Optional[dict[str, Any]]
 
     if operator == 'mask':
         operator_config = {
@@ -181,7 +183,7 @@ def annotate(text: str, analyze_results: List[RecognizerResult]):
     :param text: Full text
     :param analyze_results: list of results from presidio analyzer engine
     """
-    tokens = []
+    tokens: List[Union[str, Tuple[str, str]]] = []
 
     # Use the anonymizer to resolve overlaps
     results = anonymize(
@@ -210,7 +212,7 @@ def annotate(text: str, analyze_results: List[RecognizerResult]):
 
 
 def create_ad_hoc_deny_list_recognizer(
-    deny_list=Optional[List[str]],
+    deny_list: Optional[List[str]] = None,
 ) -> Optional[PatternRecognizer]:
     """
     Create an ad-hoc deny list recognizer.
