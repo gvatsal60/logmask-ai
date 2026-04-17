@@ -144,17 +144,28 @@ analyzer_load_state = st.info('Starting logmask analyzer...')
 
 analyzer_load_state.empty()
 
-# Read default text
-with open(file='demo/demo.log', encoding='utf-8') as f:
-    demo_text = f.readlines()
-
 # Create two columns for before and after
 col1, col2 = st.columns(2)
+
+SAMPLE_TXT = """
+Here are a few example sentences we currently support:
+
+Hi, my name is David Johnson and I'm originally from Liverpool.
+My credit card number is 4095-2609-9393-4932 and my crypto wallet id is 16Yeky6GMjeNkAiNcBY7ZhrLoMSgg1BoyZ.
+
+On 11/10/2024 I visited www.microsoft.com and sent an email to test@presidio.site,  from IP 192.168.0.1.
+
+My passport: 191280342 and my phone number: (212) 555-1234.
+
+This is a valid International Bank Account Number: IL150120690000003111111 . Can you please check the status on bank account 954567876544?
+
+Kate's social security number is 078-05-1126.  Her driver license? it is 1234567A.
+"""
 
 # Before:
 col1.subheader('Input')
 st_text = col1.text_area(
-    label='Enter text', value=''.join(demo_text), height=400, key='text_input'
+    label='Enter text', value=SAMPLE_TXT, height=400, key='text_input'
 )
 
 try:
