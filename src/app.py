@@ -244,7 +244,7 @@ try:
             )
             df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
         st.dataframe(df_subset.reset_index(
-            drop=True), width='stretch')
+            drop=True))
     else:
         st.text('No findings')
 
