@@ -10,7 +10,9 @@ from presidio_analyzer.nlp_engine import (
     NlpEngineProvider,
 )
 
-logger = logging.getLogger('presidio-streamlit')
+from _const import LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
 
 
 def create_nlp_engine_with_spacy(
@@ -21,29 +23,28 @@ def create_nlp_engine_with_spacy(
     :param model_path: path to model / model name.
     """
     nlp_configuration = {
-        'nlp_engine_name': 'spacy',
-        'models': [{'lang_code': 'en', 'model_name': model_path}],
-        'ner_model_configuration': {
-            'model_to_presidio_entity_mapping': {
-                'PER': 'PERSON',
-                'PERSON': 'PERSON',
-                'NORP': 'NRP',
-                'FAC': 'FACILITY',
-                'LOC': 'LOCATION',
-                'GPE': 'LOCATION',
-                'LOCATION': 'LOCATION',
-                'ORG': 'ORGANIZATION',
-                'ORGANIZATION': 'ORGANIZATION',
-                'DATE': 'DATE_TIME',
-                'TIME': 'DATE_TIME',
+        "nlp_engine_name": "spacy",
+        "models": [{"lang_code": "en", "model_name": model_path}],
+        "ner_model_configuration": {
+            "model_to_presidio_entity_mapping": {
+                "PER": "PERSON",
+                "PERSON": "PERSON",
+                "NORP": "NRP",
+                "FAC": "FACILITY",
+                "LOC": "LOCATION",
+                "GPE": "LOCATION",
+                "LOCATION": "LOCATION",
+                "ORG": "ORGANIZATION",
+                "ORGANIZATION": "ORGANIZATION",
+                "DATE": "DATE_TIME",
+                "TIME": "DATE_TIME",
             },
-            'low_confidence_score_multiplier': 0.4,
-            'low_score_entity_names': ['ORG', 'ORGANIZATION'],
+            "low_confidence_score_multiplier": 0.4,
+            "low_score_entity_names": ["ORG", "ORGANIZATION"],
         },
     }
 
-    nlp_engine = NlpEngineProvider(
-        nlp_configuration=nlp_configuration).create_engine()
+    nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
 
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers(nlp_engine=nlp_engine)
@@ -59,27 +60,26 @@ def create_nlp_engine_with_stanza(
     :param model_path: path to model / model name.
     """
     nlp_configuration = {
-        'nlp_engine_name': 'stanza',
-        'models': [{'lang_code': 'en', 'model_name': model_path}],
-        'ner_model_configuration': {
-            'model_to_presidio_entity_mapping': {
-                'PER': 'PERSON',
-                'PERSON': 'PERSON',
-                'NORP': 'NRP',
-                'FAC': 'FACILITY',
-                'LOC': 'LOCATION',
-                'GPE': 'LOCATION',
-                'LOCATION': 'LOCATION',
-                'ORG': 'ORGANIZATION',
-                'ORGANIZATION': 'ORGANIZATION',
-                'DATE': 'DATE_TIME',
-                'TIME': 'DATE_TIME',
+        "nlp_engine_name": "stanza",
+        "models": [{"lang_code": "en", "model_name": model_path}],
+        "ner_model_configuration": {
+            "model_to_presidio_entity_mapping": {
+                "PER": "PERSON",
+                "PERSON": "PERSON",
+                "NORP": "NRP",
+                "FAC": "FACILITY",
+                "LOC": "LOCATION",
+                "GPE": "LOCATION",
+                "LOCATION": "LOCATION",
+                "ORG": "ORGANIZATION",
+                "ORGANIZATION": "ORGANIZATION",
+                "DATE": "DATE_TIME",
+                "TIME": "DATE_TIME",
             }
         },
     }
 
-    nlp_engine = NlpEngineProvider(
-        nlp_configuration=nlp_configuration).create_engine()
+    nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
 
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers(nlp_engine=nlp_engine)
@@ -97,60 +97,59 @@ def create_nlp_engine_with_transformers(
     :param model_path: HuggingFace model path.
     """
     logger.debug(
-        'Loading Transformers model: %s of type %s', model_path, type(model_path)
+        "Loading Transformers model: %s of type %s", model_path, type(model_path)
     )
 
     nlp_configuration = {
-        'nlp_engine_name': 'transformers',
-        'models': [
+        "nlp_engine_name": "transformers",
+        "models": [
             {
-                'lang_code': 'en',
-                'model_name': {'spacy': 'en_core_web_sm', 'transformers': model_path},
+                "lang_code": "en",
+                "model_name": {"spacy": "en_core_web_sm", "transformers": model_path},
             }
         ],
-        'ner_model_configuration': {
-            'model_to_presidio_entity_mapping': {
-                'PER': 'PERSON',
-                'PERSON': 'PERSON',
-                'LOC': 'LOCATION',
-                'LOCATION': 'LOCATION',
-                'GPE': 'LOCATION',
-                'ORG': 'ORGANIZATION',
-                'ORGANIZATION': 'ORGANIZATION',
-                'NORP': 'NRP',
-                'AGE': 'AGE',
-                'ID': 'ID',
-                'EMAIL': 'EMAIL',
-                'PATIENT': 'PERSON',
-                'STAFF': 'PERSON',
-                'HOSP': 'ORGANIZATION',
-                'PATORG': 'ORGANIZATION',
-                'DATE': 'DATE_TIME',
-                'TIME': 'DATE_TIME',
-                'PHONE': 'PHONE_NUMBER',
-                'HCW': 'PERSON',
-                'HOSPITAL': 'ORGANIZATION',
-                'FACILITY': 'LOCATION',
+        "ner_model_configuration": {
+            "model_to_presidio_entity_mapping": {
+                "PER": "PERSON",
+                "PERSON": "PERSON",
+                "LOC": "LOCATION",
+                "LOCATION": "LOCATION",
+                "GPE": "LOCATION",
+                "ORG": "ORGANIZATION",
+                "ORGANIZATION": "ORGANIZATION",
+                "NORP": "NRP",
+                "AGE": "AGE",
+                "ID": "ID",
+                "EMAIL": "EMAIL",
+                "PATIENT": "PERSON",
+                "STAFF": "PERSON",
+                "HOSP": "ORGANIZATION",
+                "PATORG": "ORGANIZATION",
+                "DATE": "DATE_TIME",
+                "TIME": "DATE_TIME",
+                "PHONE": "PHONE_NUMBER",
+                "HCW": "PERSON",
+                "HOSPITAL": "ORGANIZATION",
+                "FACILITY": "LOCATION",
             },
-            'low_confidence_score_multiplier': 0.4,
-            'low_score_entity_names': ['ID'],
-            'labels_to_ignore': [
-                'CARDINAL',
-                'EVENT',
-                'LANGUAGE',
-                'LAW',
-                'MONEY',
-                'ORDINAL',
-                'PERCENT',
-                'PRODUCT',
-                'QUANTITY',
-                'WORK_OF_ART',
+            "low_confidence_score_multiplier": 0.4,
+            "low_score_entity_names": ["ID"],
+            "labels_to_ignore": [
+                "CARDINAL",
+                "EVENT",
+                "LANGUAGE",
+                "LAW",
+                "MONEY",
+                "ORDINAL",
+                "PERCENT",
+                "PRODUCT",
+                "QUANTITY",
+                "WORK_OF_ART",
             ],
         },
     }
 
-    nlp_engine = NlpEngineProvider(
-        nlp_configuration=nlp_configuration).create_engine()
+    nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
 
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers(nlp_engine=nlp_engine)

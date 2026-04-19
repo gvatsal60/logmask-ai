@@ -1,4 +1,5 @@
 """Streamlit app for logmask-ai"""
+
 import logging
 import traceback
 
@@ -15,64 +16,66 @@ from helpers import (
     analyzer_engine,
 )
 
-st.set_page_config(
-    page_title='LogMask-AI',
-    layout='wide',
-    initial_sidebar_state='expanded',
+from _const import (
+    LOGGER_NAME,
+    MODEL_HELP_TXT,
+    SAMPLE_TXT,
 )
 
-logger = logging.getLogger('logmask-ai')
+logger = logging.getLogger(LOGGER_NAME)
+
+TITLE = "LogMask-AI"
+
+st.set_page_config(
+    page_title=TITLE,
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 # Sidebar
-st.sidebar.header('LogMask-AI')
+st.sidebar.header(TITLE)
 
-MODEL_HELP_TXT = """
-    Select which Named Entity Recognition (NER) model to use for PII detection, in parallel to rule-based recognizers.
-    It supports multiple NER packages off-the-shelf, such as spaCy, Huggingface, and Stanza.
-"""
-
-ST_TA_KEY = ST_TA_ENDPOINT = ''
+ST_TA_KEY = ST_TA_ENDPOINT = ""
 
 model_list = [
-    'spaCy/en_core_web_lg',
-    # 'stanza/en',
+    "spaCy/en_core_web_lg",
+    "stanza/en",
     # 'HuggingFace/obi/deid_roberta_i2b2',
     # 'HuggingFace/StanfordAIMI/stanford-deidentifier-base',
 ]
 
 # Select model
 st_model = st.sidebar.selectbox(
-    'NER model package',
+    "NER model package",
     model_list,
     index=0,
     help=MODEL_HELP_TXT,
 )
 
 # Extract model package.
-st_model_package = st_model.split('/')[0]
+st_model_package = st_model.split("/")[0]
 
 # Remove package prefix (if needed)
 st_model = (
     st_model
-    if st_model_package.lower() not in ('spacy', 'stanza', 'huggingface')
-    else '/'.join(st_model.split('/')[1:])
+    if st_model_package.lower() not in ("spacy", "stanza", "huggingface")
+    else "/".join(st_model.split("/")[1:])
 )
 
-if st_model == 'Other':
+if st_model == "Other":
     st_model_package = st.sidebar.selectbox(
-        'NER model OSS package', options=['spaCy', 'stanza', 'HuggingFace']
+        "NER model OSS package", options=["spaCy", "stanza", "HuggingFace"]
     )
-    st_model = st.sidebar.text_input(label='NER model name', value='')
+    st_model = st.sidebar.text_input(label="NER model name", value="")
 
-st.sidebar.warning('Note: Models might take some time to download. ')
+st.sidebar.warning("Note: Models might take some time to download.")
 
 analyzer_params = (st_model_package, st_model, ST_TA_KEY, ST_TA_ENDPOINT)
-logger.debug('analyzer_params: {analyzer_params}')
+logger.debug("analyzer_params: {analyzer_params}")
 
 st_operator = st.sidebar.selectbox(
-    label='De-identification approach',
-    options=['redact', 'replace',
-             'highlight', 'mask', 'hash', 'encrypt'],
+    label="De-identification approach",
+    options=["redact", "replace", "highlight", "mask", "hash", "encrypt"],
     index=1,
     help="""
     Select which manipulation to the text is requested after PII has been identified.\n
@@ -85,99 +88,84 @@ st_operator = st.sidebar.selectbox(
     - Encrypt: Replaces with an AES encryption of the PII string, allowing the process to be reversed
     """,
 )
-ST_MASK_CHAR = '*'
+ST_MASK_CHAR = "*"
 ST_NUM_OF_CHARS = 15
-ST_ENCRYPT_KEY = 'WmZq4t7w!z%C&F)J'
+ST_ENCRYPT_KEY = "WmZq4t7w!z%C&F)J"
 
-logger.debug('st_operator: %s', st_operator)
+logger.debug("st_operator: %s", st_operator)
 
-if st_operator == 'mask':
+if st_operator == "mask":
     ST_NUM_OF_CHARS = st.sidebar.number_input(
-        'number of chars', value=ST_NUM_OF_CHARS, min_value=0, max_value=100
+        "number of chars", value=ST_NUM_OF_CHARS, min_value=0, max_value=100
     )
     ST_MASK_CHAR = st.sidebar.text_input(
-        'Mask character', value=ST_MASK_CHAR, max_chars=1
+        "Mask character", value=ST_MASK_CHAR, max_chars=1
     )
-elif st_operator == 'encrypt':
-    ST_ENCRYPT_KEY = st.sidebar.text_input('AES key', value=ST_ENCRYPT_KEY)
+elif st_operator == "encrypt":
+    ST_ENCRYPT_KEY = st.sidebar.text_input("AES key", value=ST_ENCRYPT_KEY)
 
 st_threshold = st.sidebar.slider(
-    label='Acceptance threshold',
+    label="Acceptance threshold",
     min_value=0.0,
     max_value=1.0,
     value=0.35,
-    help='Define the threshold for accepting a detection as PII. See more here: ',
+    help="Define the threshold for accepting a detection as PII. See more here: ",
 )
 
 st_return_decision_process = st.sidebar.checkbox(
-    'Add analysis explanations to findings',
+    "Add analysis explanations to findings",
     value=False,
     help="""Add the decision process to the output table.""",
 )
 
 # Allow and deny lists
 st_deny_allow_expander = st.sidebar.expander(
-    'Allowlists and denylists',
+    "Allowlists and denylists",
     expanded=False,
 )
 
 with st_deny_allow_expander:
     st_allow_list = st_tags(
-        label='Add words to the allowlist', text='Enter word and press enter.'
+        label="Add words to the allowlist", text="Enter word and press enter."
     )
     st.caption(
-        'Allowlists contain words that are not considered PII, but are detected as such.'
+        "Allowlists contain words that are not considered PII, but are detected as such."
     )
 
     st_deny_list = st_tags(
-        label='Add words to the denylist', text='Enter word and press enter.'
+        label="Add words to the denylist", text="Enter word and press enter."
     )
     st.caption(
-        'Denylists contain words that are considered PII, but are not detected as such.'
+        "Denylists contain words that are considered PII, but are not detected as such."
     )
 
 # Main panel
-analyzer_load_state = st.info('Starting logmask analyzer...')
+analyzer_load_state = st.info("Starting logmask analyzer...")
 
 analyzer_load_state.empty()
 
 # Create two columns for before and after
 col1, col2 = st.columns(2)
 
-SAMPLE_TXT = """
-Here are a few example sentences we currently support:
-
-Hi, my name is David Johnson and I'm originally from Liverpool.
-My credit card number is 4095-2609-9393-4932 and my crypto wallet id is 16Yeky6GMjeNkAiNcBY7ZhrLoMSgg1BoyZ.
-
-On 11/10/2024 I visited www.microsoft.com and sent an email to test@presidio.site,  from IP 192.168.0.1.
-
-My passport: 191280342 and my phone number: (212) 555-1234.
-
-This is a valid International Bank Account Number: IL150120690000003111111 . Can you please check the status on bank account 954567876544?
-
-Kate's social security number is 078-05-1126.  Her driver license? it is 1234567A.
-"""
-
 # Before:
-col1.subheader('Input')
+col1.subheader("Input")
 st_text = col1.text_area(
-    label='Enter text', value=SAMPLE_TXT, height=400, key='text_input'
+    label="Enter text", value=SAMPLE_TXT, height=400, key="text_input"
 )
 
 try:
     # Choose entities
-    st_entities_expander = st.sidebar.expander('Choose entities to look for')
+    st_entities_expander = st.sidebar.expander("Choose entities to look for")
     st_entities = st_entities_expander.multiselect(
-        label='Which entities to look for?',
+        label="Which entities to look for?",
         options=get_supported_entities(*analyzer_params),
         default=list(get_supported_entities(*analyzer_params)),
-        help='Limit the list of PII entities detected. '
-        'This list is dynamic and based on the NER model and registered recognizers. ',
+        help="Limit the list of PII entities detected. "
+        "This list is dynamic and based on the NER model and registered recognizers. ",
     )
 
     # Before
-    analyzer_load_state = st.info('Starting logmask analyzer...')
+    analyzer_load_state = st.info("Starting logmask analyzer...")
     analyzer = analyzer_engine(*analyzer_params)
     analyzer_load_state.empty()
 
@@ -185,7 +173,7 @@ try:
         *analyzer_params,
         text=st_text,
         entities=st_entities,
-        language='en',
+        language="en",
         score_threshold=st_threshold,
         return_decision_process=st_return_decision_process,
         allow_list=st_allow_list,
@@ -193,9 +181,9 @@ try:
     )
 
     # After
-    if st_operator not in ('highlight', 'synthesize'):
+    if st_operator not in ("highlight", "synthesize"):
         with col2:
-            st.subheader('Output')
+            st.subheader("Output")
             st_anonymize_results = anonymize(
                 text=st_text,
                 operator=st_operator,
@@ -205,10 +193,10 @@ try:
                 analyze_results=st_analyze_results,
             )
             st.text_area(
-                label='De-identified', value=st_anonymize_results.text, height=400
+                label="De-identified", value=st_anonymize_results.text, height=400
             )
     else:
-        st.subheader('Highlighted')
+        st.subheader("Highlighted")
         annotated_tokens = annotate(
             text=st_text, analyze_results=st_analyze_results)
         # annotated_tokens
@@ -216,37 +204,36 @@ try:
 
     # table result
     st.subheader(
-        'Findings'
+        "Findings"
         if not st_return_decision_process
-        else 'Findings with decision factors'
+        else "Findings with decision factors"
     )
     if st_analyze_results:
         df = pd.DataFrame.from_records(
             [r.to_dict() for r in st_analyze_results])
-        df['text'] = [st_text[res.start: res.end]
+        df["text"] = [st_text[res.start: res.end]
                       for res in st_analyze_results]
 
-        df_subset = df[['entity_type', 'text', 'start', 'end', 'score']].rename(
+        df_subset = df[["entity_type", "text", "start", "end", "score"]].rename(
             {
-                'entity_type': 'Entity type',
-                'text': 'Text',
-                'start': 'Start',
-                'end': 'End',
-                'score': 'Confidence',
+                "entity_type": "Entity type",
+                "text": "Text",
+                "start": "Start",
+                "end": "End",
+                "score": "Confidence",
             },
             axis=1,
         )
-        df_subset['Text'] = [st_text[res.start: res.end]
+        df_subset["Text"] = [st_text[res.start: res.end]
                              for res in st_analyze_results]
         if st_return_decision_process:
             analysis_explanation_df = pd.DataFrame.from_records(
                 [r.analysis_explanation.to_dict() for r in st_analyze_results]
             )
             df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
-        st.dataframe(df_subset.reset_index(
-            drop=True))
+        st.dataframe(df_subset.reset_index(drop=True))
     else:
-        st.text('No findings')
+        st.text("No findings")
 
 except Exception as e:
     print(e)
