@@ -21,3 +21,7 @@ test = [
 en_core_web_lg = [
   "en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0.tar.gz",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["test"]
