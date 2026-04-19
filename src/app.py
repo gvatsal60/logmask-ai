@@ -71,7 +71,7 @@ if st_model == "Other":
 st.sidebar.warning("Note: Models might take some time to download.")
 
 analyzer_params = (st_model_package, st_model, ST_TA_KEY, ST_TA_ENDPOINT)
-logger.debug("analyzer_params: {analyzer_params}")
+logger.debug("analyzer_params: %s", analyzer_params)
 
 st_operator = st.sidebar.selectbox(
     label="De-identification approach",
