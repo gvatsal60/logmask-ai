@@ -5,6 +5,7 @@ Test helpers functions.
 from presidio_analyzer import RecognizerResult
 from presidio_anonymizer import AnonymizerEngine
 
+import helpers
 from helpers import analyze, anonymize
 from _const import SAMPLE_TXT
 

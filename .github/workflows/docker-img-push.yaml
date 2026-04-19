@@ -43,15 +43,6 @@ jobs:
           if [ "$REF_TYPE" = "tag" ] && [ "$REF_NAME" != "" ]; then
             echo "TAG_NAME=$REF_NAME" >> "${GITHUB_ENV}"
           fi
-      - name: Set variable based on actor
-        env:
-          ACTOR: ${{ github.actor }}
-        run: |
-          if [[ "$ACTOR" == *"bot"* ]]; then
-            echo "GITHUB_ACTOR=bot" >> $GITHUB_ENV
-          else
-            echo "GITHUB_ACTOR=$ACTOR" >> $GITHUB_ENV
-          fi
       - name: Build Docker image only
         if: github.event_name == 'pull_request'
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
@@ -60,7 +51,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: false
           load: true
-          tags: ghcr.io/${{ env.GITHUB_ACTOR }}/${{ env.IMG_REPO_NAME }}:${{ env.TAG_NAME }}
+          tags: ghcr.io/${{ github.repository }}:${{ env.TAG_NAME }}
       - name: Build and push Docker image
         if: github.event_name == 'push'
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
@@ -69,4 +60,4 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           load: true
-          tags: ghcr.io/${{ env.GITHUB_ACTOR }}/${{ env.IMG_REPO_NAME }}:${{ env.TAG_NAME }}
+          tags: ghcr.io/${{ github.repository }}:${{ env.TAG_NAME }}
