@@ -118,6 +118,9 @@ class TestAnonymize(unittest.TestCase):
             analyze_results=analyze_results,
         )
         self.assertIsNotNone(result)
+        self.assertEqual(result.text, text)
+        self.assertTrue(result.items)
+        self.assertEqual(len(result.items), len(analyze_results))
 
     def test_anonymize_synthesize_operator(self):
         text = 'My name is John Smith.'
