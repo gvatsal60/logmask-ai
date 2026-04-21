@@ -2,7 +2,7 @@
 Constants for the logmask-ai app
 """
 
-LOGGER_NAME = "logmask-ai"
+LOGGER_NAME = 'logmask-ai'
 
 MODEL_HELP_TXT = """
     Select which Named Entity Recognition (NER) model to use for PII detection, in parallel to rule-based recognizers.
@@ -23,4 +23,3 @@ This is a valid International Bank Account Number: IL150120690000003111111 . Can
 
 Kate's social security number is 078-05-1126.  Her driver license? it is 1234567A.
 """
-
