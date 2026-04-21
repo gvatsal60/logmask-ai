@@ -40,8 +40,6 @@ ST_TA_KEY = ST_TA_ENDPOINT = ''
 model_list = [
     'spaCy/en_core_web_lg',
     'stanza/en',
-    # 'HuggingFace/obi/deid_roberta_i2b2',
-    # 'HuggingFace/StanfordAIMI/stanford-deidentifier-base',
 ]
 
 # Select model
