@@ -10,8 +10,6 @@ MODEL_HELP_TXT = """
 """
 
 SAMPLE_TXT = """
-Here are a few example sentences we currently support:
-
 Hi, my name is David Johnson and I'm originally from Liverpool.
 My credit card number is 4095-2609-9393-4932 and my crypto wallet id is 16Yeky6GMjeNkAiNcBY7ZhrLoMSgg1BoyZ.
 
