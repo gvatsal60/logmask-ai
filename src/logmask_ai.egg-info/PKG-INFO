@@ -1,0 +1,118 @@
+Metadata-Version: 2.4
+Name: logmask-ai
+Version: 0.0.1
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: presidio-analyzer[transformers]>=2.2.362
+Requires-Dist: presidio-anonymizer>=2.2.362
+Requires-Dist: spacy>=3.8.14
+Requires-Dist: st-annotated-text>=4.0.2
+Requires-Dist: stanza>=1.11.1
+Requires-Dist: streamlit>=1.56.0
+Requires-Dist: streamlit-tags>=1.2.8
+Provides-Extra: test
+Requires-Dist: pytest>=9.0.3; extra == "test"
+Provides-Extra: en-core-web-lg
+Requires-Dist: en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0.tar.gz ; extra == "en-core-web-lg"
+Dynamic: license-file
+
+---
+title: logmask-ai
+sdk: docker
+python_version: 3.12
+app_port: 8501
+tags:
+- streamlit
+- genai
+- python
+pinned: false
+short_description: AI-Powered Generic Log Anonymization
+license: apache-2.0
+---
+
+<!-- markdownlint-disable MD025 -->
+# Log Masking and Analysis App
+
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/gvatsal60/logmask-ai/blob/HEAD/LICENSE)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gvatsal60_logmask-ai&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=gvatsal60_logmask-ai)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/gvatsal60/logmask-ai/master.svg)](https://results.pre-commit.ci/latest/github/gvatsal60/logmask-ai/HEAD)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/8eaddb15db414c6d8508d09edf485629)](https://app.codacy.com/gh/gvatsal60/logmask-ai/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![CodeFactor](https://www.codefactor.io/repository/github/gvatsal60/logmask-ai/badge)](https://www.codefactor.io/repository/github/gvatsal60/logmask-ai)
+
+This project can:
+
+- Scan `.log` files from a folder (default: `logs/`)
+- Mask sensitive data using Presidio analyzer/anonymizer services
+- Analyze masked content with built-in heuristics
+- Optionally send masked content to an Ollama model through LiteLLM for deeper analysis
+
+## Setup
+
+```bash
+make sync
+make up
+```
+
+## Usage
+
+### 1. Process all logs from `logs/`
+
+```bash
+uv run python main.py
+```
+
+Masked files are written to `masked_logs/`.
+
+### 2. Process logs from a custom folder
+
+```bash
+uv run python main.py --log-dir ./logs --file-glob "*" --output-dir ./masked_logs
+```
+
+### 3. Process direct input text
+
+```bash
+uv run python main.py --input-text "User email is test@example.com and IP 10.0.0.10" --print-masked
+```
+
+### 4. Process a single input file
+
+```bash
+uv run python main.py --input-file ./logs/sip.log --output-dir ./masked_logs --print-masked
+```
+
+### 5. Include LLM analysis (on masked content)
+
+```bash
+uv run python main.py --analyze
+```
+
+You can override model and endpoint:
+
+```bash
+uv run python main.py --analyze --model ollama/tinyllama --api-base http://localhost:11434
+```
+
+### 6. Override Presidio endpoints
+
+```bash
+uv run python main.py \
+ --presidio-analyzer-url http://localhost:5002/analyze \
+ --presidio-anonymizer-url http://localhost:5001/anonymize
+```
+
+## Notes
+
+- Masking is performed by Presidio APIs (no Python regex masking in the app).
+- LLM analysis is always run on masked text, not raw input.
+- If no `--input-text` or `--input-file` is passed, the app scans `--log-dir`.
+- If `--model` is not passed, model falls back to `model_name` from `config.yaml`, then `ollama/tinyllama`.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 🛡️ License
+
+This project is licensed under the Apache 2.0 License. See [LICENSE](LICENSE) for details.

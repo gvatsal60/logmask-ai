@@ -228,7 +228,7 @@ try:
                              for res in st_analyze_results]
         if st_return_decision_process:
             analysis_explanation_df = pd.DataFrame.from_records(
-                [r.analysis_explanation.to_dict() for r in st_analyze_results]
+                [r.analysis_explanation.to_dict() if r.analysis_explanation is not None else {} for r in st_analyze_results]
             )
             df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
         st.dataframe(df_subset.reset_index(drop=True))
