@@ -1,4 +1,5 @@
 """Streamlit app for logmask-ai"""
+
 import logging
 import traceback
 
@@ -15,27 +16,30 @@ from helpers import (
     analyzer_engine,
 )
 
+from _const import (
+    LOGGER_NAME,
+    MODEL_HELP_TXT,
+    SAMPLE_TXT,
+)
+
+logger = logging.getLogger(LOGGER_NAME)
+
+TITLE = 'LogMask-AI'
+
 st.set_page_config(
-    page_title='LogMask-AI',
+    page_title=TITLE,
     layout='wide',
     initial_sidebar_state='expanded',
 )
 
-logger = logging.getLogger('logmask-ai')
-
 # Sidebar
-st.sidebar.header('LogMask-AI')
-
-MODEL_HELP_TXT = """
-    Select which Named Entity Recognition (NER) model to use for PII detection, in parallel to rule-based recognizers.
-    It supports multiple NER packages off-the-shelf, such as spaCy, Huggingface, and Stanza.
-"""
+st.sidebar.header(TITLE)
 
 ST_TA_KEY = ST_TA_ENDPOINT = ''
 
 model_list = [
     'spaCy/en_core_web_lg',
-    # 'stanza/en',
+    'stanza/en',
     # 'HuggingFace/obi/deid_roberta_i2b2',
     # 'HuggingFace/StanfordAIMI/stanford-deidentifier-base',
 ]
@@ -64,15 +68,14 @@ if st_model == 'Other':
     )
     st_model = st.sidebar.text_input(label='NER model name', value='')
 
-st.sidebar.warning('Note: Models might take some time to download. ')
+st.sidebar.warning('Note: Models might take some time to download.')
 
 analyzer_params = (st_model_package, st_model, ST_TA_KEY, ST_TA_ENDPOINT)
-logger.debug('analyzer_params: {analyzer_params}')
+logger.debug('analyzer_params: %s', analyzer_params)
 
 st_operator = st.sidebar.selectbox(
     label='De-identification approach',
-    options=['redact', 'replace',
-             'highlight', 'mask', 'hash', 'encrypt'],
+    options=['redact', 'replace', 'highlight', 'mask', 'hash', 'encrypt'],
     index=1,
     help="""
     Select which manipulation to the text is requested after PII has been identified.\n
@@ -143,21 +146,6 @@ analyzer_load_state.empty()
 
 # Create two columns for before and after
 col1, col2 = st.columns(2)
-
-SAMPLE_TXT = """
-Here are a few example sentences we currently support:
-
-Hi, my name is David Johnson and I'm originally from Liverpool.
-My credit card number is 4095-2609-9393-4932 and my crypto wallet id is 16Yeky6GMjeNkAiNcBY7ZhrLoMSgg1BoyZ.
-
-On 11/10/2024 I visited www.microsoft.com and sent an email to test@presidio.site,  from IP 192.168.0.1.
-
-My passport: 191280342 and my phone number: (212) 555-1234.
-
-This is a valid International Bank Account Number: IL150120690000003111111 . Can you please check the status on bank account 954567876544?
-
-Kate's social security number is 078-05-1126.  Her driver license? it is 1234567A.
-"""
 
 # Before:
 col1.subheader('Input')
@@ -243,8 +231,7 @@ try:
                 [r.analysis_explanation.to_dict() for r in st_analyze_results]
             )
             df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
-        st.dataframe(df_subset.reset_index(
-            drop=True))
+        st.dataframe(df_subset.reset_index(drop=True))
     else:
         st.text('No findings')
 

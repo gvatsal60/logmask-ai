@@ -10,7 +10,9 @@ from presidio_analyzer.nlp_engine import (
     NlpEngineProvider,
 )
 
-logger = logging.getLogger('presidio-streamlit')
+from _const import LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
 
 
 def create_nlp_engine_with_spacy(
@@ -42,8 +44,7 @@ def create_nlp_engine_with_spacy(
         },
     }
 
-    nlp_engine = NlpEngineProvider(
-        nlp_configuration=nlp_configuration).create_engine()
+    nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
 
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers(nlp_engine=nlp_engine)
@@ -78,8 +79,7 @@ def create_nlp_engine_with_stanza(
         },
     }
 
-    nlp_engine = NlpEngineProvider(
-        nlp_configuration=nlp_configuration).create_engine()
+    nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
 
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers(nlp_engine=nlp_engine)
@@ -149,8 +149,7 @@ def create_nlp_engine_with_transformers(
         },
     }
 
-    nlp_engine = NlpEngineProvider(
-        nlp_configuration=nlp_configuration).create_engine()
+    nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
 
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers(nlp_engine=nlp_engine)

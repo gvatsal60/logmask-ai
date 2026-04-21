@@ -20,11 +20,13 @@ import streamlit as st
 
 from nlp_engine_config import (
     create_nlp_engine_with_spacy,
-    create_nlp_engine_with_transformers,
     create_nlp_engine_with_stanza,
+    create_nlp_engine_with_transformers,
 )
 
-logger = logging.getLogger('presidio-streamlit')
+from _const import LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
 
 
 @st.cache_resource
