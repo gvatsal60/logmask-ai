@@ -206,7 +206,9 @@ def test_helpers_logic(monkeypatch):
         deny_list=[],
     )
     assert len(st_analyze_results) > 0
-    assert fake_engine.last_kwargs['entities'] is None
+    assert fake_engine.last_kwargs is not None
+    assert 'entities' in fake_engine.last_kwargs
+    assert fake_engine.last_kwargs.get('entities') is None
     assert 'deny_list' not in fake_engine.last_kwargs
 
     # Anonymize
