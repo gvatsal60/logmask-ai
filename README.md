@@ -37,12 +37,12 @@ No custom regex-only masking pipeline is used as the primary anonymization flow.
 
 - Interactive Streamlit UI for input and output text comparison
 - Configurable de-identification operators:
- 	- `replace`
- 	- `redact`
- 	- `mask`
- 	- `hash`
- 	- `encrypt`
- 	- `highlight`
+  - `replace`
+  - `redact`
+  - `mask`
+  - `hash`
+  - `encrypt`
+  - `highlight`
 - Adjustable analysis confidence threshold
 - Dynamic entity selection based on loaded recognizers/model
 - Optional allowlist and denylist controls
@@ -129,4 +129,3 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 ## 🛡️ License
 
 This project is licensed under the Apache 2.0 License. See [LICENSE](LICENSE) for details.
-
