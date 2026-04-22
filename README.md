@@ -13,7 +13,7 @@ license: apache-2.0
 ---
 
 <!-- markdownlint-disable MD025 -->
-# Log Masking and Analysis App
+# logmask-ai
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/gvatsal60/logmask-ai/blob/HEAD/LICENSE)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gvatsal60_logmask-ai&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=gvatsal60_logmask-ai)
@@ -21,74 +21,106 @@ license: apache-2.0
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/8eaddb15db414c6d8508d09edf485629)](https://app.codacy.com/gh/gvatsal60/logmask-ai/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/gvatsal60/logmask-ai/badge)](https://www.codefactor.io/repository/github/gvatsal60/logmask-ai)
 
-This project can:
+`logmask-ai` is a Streamlit application for **PII detection and de-identification** in text.
 
-- Scan `.log` files from a folder (default: `logs/`)
-- Mask sensitive data using Presidio analyzer/anonymizer services
-- Analyze masked content with built-in heuristics
-- Optionally send masked content to an Ollama model through LiteLLM for deeper analysis
+## Presidio-Based Architecture
+
+This project is explicitly built on **Microsoft Presidio** (sometimes misspelled as "persidio").
+
+- Detection is powered by `presidio-analyzer`.
+- De-identification is powered by `presidio-anonymizer`.
+- The app combines Presidio recognizers with selectable NLP backends (spaCy, Stanza, and transformers support in helper code).
+
+No custom regex-only masking pipeline is used as the primary anonymization flow. The core anonymization path is Presidio-based.
+
+## Features
+
+- Interactive Streamlit UI for input and output text comparison
+- Configurable de-identification operators:
+	- `replace`
+	- `redact`
+	- `mask`
+	- `hash`
+	- `encrypt`
+	- `highlight`
+- Adjustable analysis confidence threshold
+- Dynamic entity selection based on loaded recognizers/model
+- Optional allowlist and denylist controls
+- Findings table with confidence scores and optional decision-process metadata
 
 ## Setup
 
 ```bash
 make sync
-make up
 ```
 
-## Usage
-
-### 1. Process all logs from `logs/`
+## Run
 
 ```bash
-uv run python main.py
+make run
 ```
 
-Masked files are written to `masked_logs/`.
-
-### 2. Process logs from a custom folder
+Or directly:
 
 ```bash
-uv run python main.py --log-dir ./logs --file-glob "*" --output-dir ./masked_logs
+uv run streamlit run src/app.py
 ```
 
-### 3. Process direct input text
+## Test
 
 ```bash
-uv run python main.py --input-text "User email is test@example.com and IP 10.0.0.10" --print-masked
+make test
 ```
 
-### 4. Process a single input file
+## Models
 
-```bash
-uv run python main.py --input-file ./logs/sip.log --output-dir ./masked_logs --print-masked
+The UI currently exposes:
+
+- `spaCy/en_core_web_lg`
+- `stanza/en`
+
+The helper layer also supports a transformers-based NLP engine configuration.
+
+## Optional: Presidio Service Containers
+
+`docker-compose.yml` includes container definitions for:
+
+- `mcr.microsoft.com/presidio-analyzer`
+- `mcr.microsoft.com/presidio-anonymizer`
+
+These are useful if you want to run Presidio services in containers. The current Streamlit app implementation uses the Presidio Python packages directly.
+
+## Project Structure
+
+```text
+src/
+	app.py                # Streamlit UI
+	helpers.py            # Presidio analysis/anonymization helpers
+	nlp_engine_config.py  # NLP engine wiring (spaCy/Stanza/transformers)
+	_const.py             # App constants and sample text
+test/
+	test_helpers.py       # Unit tests for helper logic
 ```
 
-### 5. Include LLM analysis (on masked content)
+## Why Presidio?
 
-```bash
-uv run python main.py --analyze
-```
+Presidio provides:
 
-You can override model and endpoint:
+- mature recognizers for common PII entities
+- explainable detection results with scores
+- multiple anonymization operators
+- extensibility with custom recognizers and deny lists
 
-```bash
-uv run python main.py --analyze --model ollama/tinyllama --api-base http://localhost:11434
-```
+This makes it a strong fit for privacy-first log and text sanitization workflows.
 
-### 6. Override Presidio endpoints
+## Attribution
 
-```bash
-uv run python main.py \
- --presidio-analyzer-url http://localhost:5002/analyze \
- --presidio-anonymizer-url http://localhost:5001/anonymize
-```
+Parts of this project are adapted from Microsoft Presidio samples.
 
-## Notes
+- Upstream project: https://github.com/microsoft/presidio
+- Upstream license: MIT License
 
-- Masking is performed by Presidio APIs (no Python regex masking in the app).
-- LLM analysis is always run on masked text, not raw input.
-- If no `--input-text` or `--input-file` is passed, the app scans `--log-dir`.
-- If `--model` is not passed, model falls back to `model_name` from `config.yaml`, then `ollama/tinyllama`.
+Presidio copyright and license notices apply to the adapted portions.
 
 ## 🤝 Contributing
 
