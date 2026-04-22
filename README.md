@@ -37,12 +37,12 @@ No custom regex-only masking pipeline is used as the primary anonymization flow.
 
 - Interactive Streamlit UI for input and output text comparison
 - Configurable de-identification operators:
-	- `replace`
-	- `redact`
-	- `mask`
-	- `hash`
-	- `encrypt`
-	- `highlight`
+ 	- `replace`
+ 	- `redact`
+ 	- `mask`
+ 	- `hash`
+ 	- `encrypt`
+ 	- `highlight`
 - Adjustable analysis confidence threshold
 - Dynamic entity selection based on loaded recognizers/model
 - Optional allowlist and denylist controls
@@ -94,12 +94,12 @@ These are useful if you want to run Presidio services in containers. The current
 
 ```text
 src/
-	app.py                # Streamlit UI
-	helpers.py            # Presidio analysis/anonymization helpers
-	nlp_engine_config.py  # NLP engine wiring (spaCy/Stanza/transformers)
-	_const.py             # App constants and sample text
+ app.py                # Streamlit UI
+ helpers.py            # Presidio analysis/anonymization helpers
+ nlp_engine_config.py  # NLP engine wiring (spaCy/Stanza/transformers)
+ _const.py             # App constants and sample text
 test/
-	test_helpers.py       # Unit tests for helper logic
+ test_helpers.py       # Unit tests for helper logic
 ```
 
 ## Why Presidio?
