@@ -129,3 +129,4 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 ## 🛡️ License
 
 This project is licensed under the Apache 2.0 License. See [LICENSE](LICENSE) for details.
+
