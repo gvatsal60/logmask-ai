@@ -10,7 +10,7 @@ dependencies = [
   "spacy>=3.8.14",
   "st-annotated-text>=4.0.2",
   "stanza>=1.11.1",
-  "streamlit>=1.56.0",
+  "streamlit>=1.57.0",
   "streamlit-tags>=1.2.8",
 ]
 
