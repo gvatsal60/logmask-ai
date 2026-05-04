@@ -225,3 +225,5 @@ def test_helpers_logic(monkeypatch):
     assert st_anonymize_results.text != ''
     assert st_anonymize_results.text != st_text
     assert 'David Johnson' not in st_anonymize_results.text
+
+
