@@ -16,7 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-  "pytest>=9.0.3",
+  "pytest>=9.1.0",
 ]
 
 en_core_web_lg = [
