@@ -1,7 +1,6 @@
 # ##########################################################################
 # File: Dockerfile
 # Author: Vatsal Gupta (gvatsal60)
-# Date: 21-Sep-2025
 # Description: Dockerfile for a Streamlit application.
 # ##########################################################################
 
