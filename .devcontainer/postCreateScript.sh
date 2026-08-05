@@ -19,7 +19,6 @@
 
 # Ensure that the development environment is consistently set up with the necessary tools and settings for a smooth workflow.
 ##########################################################################################
-
 ##########################################################################################
 # License
 ##########################################################################################
@@ -74,3 +73,4 @@ if [ -n "${CODESPACE_NAME}" ]; then
         done
     fi
 fi
+
