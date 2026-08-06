@@ -3,7 +3,6 @@
 ##########################################################################################
 # File: postCreateScript.sh
 # Author: Vatsal Gupta
-# Date: 09-Jul-2024
 # Description:
 
 # This script runs automatically after the DevContainer environment has been created.
@@ -20,7 +19,6 @@
 
 # Ensure that the development environment is consistently set up with the necessary tools and settings for a smooth workflow.
 ##########################################################################################
-
 ##########################################################################################
 # License
 ##########################################################################################
@@ -40,6 +38,13 @@ readonly UV_INSTALL_URL="https://astral.sh/uv/install.sh"
 ##########################################################################################
 # Functions
 ##########################################################################################
+curl_https() {
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "Error: curl is not installed. Aborting." >&2
+        return 1
+    fi
+    curl -fsSL --proto '=https' "$@"
+}
 
 ##########################################################################################
 # Main Script
@@ -47,13 +52,8 @@ readonly UV_INSTALL_URL="https://astral.sh/uv/install.sh"
 
 # Install Linux aliases from external script using curl and execute immediately
 # Note: Make sure to review scripts fetched from external sources for security reasons
-if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "${ALIAS_SRC_URL}" | sh
-    curl -fsSL "${UV_INSTALL_URL}" | sh
-else
-    echo "Error: curl is not installed. Unable to use Linux aliases"
-    exit 1
-fi
+curl_https "${ALIAS_SRC_URL}" | sh
+curl_https "${UV_INSTALL_URL}" | sh
 
 # As bind mounts not supported in GitHub Codespaces
 if [ -n "${CODESPACE_NAME}" ]; then
