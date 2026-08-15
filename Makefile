@@ -7,11 +7,11 @@ help: ## Show this help message
 TOP_DIR := $(shell git rev-parse --show-toplevel)
 SRC_DIR := $(TOP_DIR)/src
 
-.PHONY: help all run test clean add sync debug
+.PHONY: help all run test clean sync debug add
 
 all: sync run ## Run sync then start the app
 
-add: ## Add a new package (usage: make add pkg=\"package_name\")
+add: ## Add a new package (usage: make add pkg="package_name")
 	@if [ -z "$(pkg)" ]; then \
 		echo "❌ Usage: make $@ pkg=\"package_name\"\n"; \
 		exit 1; \
