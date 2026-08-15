@@ -1,49 +1,36 @@
-#***************************************************************************************
-# * File: Makefile
-# * Author: Vatsal Gupta
-# * Date: 04-Apr-2026
-# * Description: Makefile for managing the GenAI application.
-# **************************************************************************************/
+# Default target
+.DEFAULT_GOAL := help
 
-#***************************************************************************************
-# * License
-# **************************************************************************************/
-# This file is licensed under the Apache 2.0 License.
-# License information should be updated as necessary.
+help: ## Show this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}' || echo "No annotated targets found."
 
-#***************************************************************************************
-# * Variables
-# **************************************************************************************/
 TOP_DIR := $(shell git rev-parse --show-toplevel)
 SRC_DIR := $(TOP_DIR)/src
 
-#***************************************************************************************
-# * Targets
-# **************************************************************************************/
-.PHONY: all run test clean
+.PHONY: help all run test clean sync debug add
 
-all: sync run
+all: sync run ## Run sync then start the app
 
-add:
+add: ## Add a new package (usage: make add pkg="package_name")
 	@if [ -z "$(pkg)" ]; then \
 		echo "❌ Usage: make $@ pkg=\"package_name\"\n"; \
 		exit 1; \
 	fi
 	@uv add --no-cache $(pkg)
 
-sync:
+sync: ## Sync project dependencies
 	@uv sync --no-cache --all-extras
 
-debug:
+debug: ## Run the app in debug mode with auto-reload
 	@uv run streamlit run "$(SRC_DIR)/app.py" --server.runOnSave true
 
-run: sync
+run: sync ## Start the Streamlit app
 	@uv run streamlit run "$(SRC_DIR)/app.py"
 
-test:
+test: ## Run the test suite
 	@echo "Running tests..."
 	@uv run python -m pytest
 
-clean:
+clean: ## Clean build artifacts and caches
 	@uv clean
 	@rm -rf .venv __pycache__ .mypy_cache
