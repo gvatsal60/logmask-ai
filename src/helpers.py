@@ -3,7 +3,6 @@ Helper methods for the app
 """
 
 from typing import Any, List, Optional, Tuple, Union
-import logging
 
 from presidio_analyzer import (
     AnalyzerEngine,
@@ -24,30 +23,18 @@ from nlp_engine_config import (
     create_nlp_engine_with_transformers,
 )
 
-from _const import LOGGER_NAME
-
-logger = logging.getLogger(LOGGER_NAME)
-
-
 @st.cache_resource
 def nlp_engine_and_registry(
     model_family: str,
     model_path: str,
-    ta_key: Optional[str] = None,
-    ta_endpoint: Optional[str] = None,
 ) -> Tuple[NlpEngine, RecognizerRegistry]:
     """Create the NLP Engine instance based on the requested model.
     :param model_family:
       Which model package to use for NER.
     :param model_path:
       Which model to use for NER. E.g.,
-        "StanfordAIMI/stanford-deidentifier-base",
-        "obi/deid_roberta_i2b2",
-        "en_core_web_lg"
-    :param ta_key:
-      Key to the Text Analytics endpoint (only if model_path = "Azure Text Analytics")
-    :param ta_endpoint:
-      Endpoint of the Text Analytics instance (only if model_path = "Azure Text Analytics")
+        "stanza/en",
+        "spaCy/en_core_web_lg"
     """
 
     # Set up NLP Engine according to the model of choice
@@ -65,24 +52,18 @@ def nlp_engine_and_registry(
 def analyzer_engine(
     model_family: str,
     model_path: str,
-    ta_key: Optional[str] = None,
-    ta_endpoint: Optional[str] = None,
 ) -> AnalyzerEngine:
     """Create the NLP Engine instance based on the requested model.
     :param model_family:
       Which model package to use for NER.
     :param model_path:
-      Which model to use for NER:
-        "StanfordAIMI/stanford-deidentifier-base",
-        "obi/deid_roberta_i2b2",
-        "en_core_web_lg"
-    :param ta_key:
-      Key to the Text Analytics endpoint (only if model_path = "Azure Text Analytics")
-    :param ta_endpoint:
-      Endpoint of the Text Analytics instance (only if model_path = "Azure Text Analytics")
+      Which model to use for NER. E.g.,
+        "stanza/en",
+        "spaCy/en_core_web_lg"
     """
     nlp_engine, registry = nlp_engine_and_registry(
-        model_family, model_path, ta_key, ta_endpoint
+        model_family,
+        model_path,
     )
     analyzer = AnalyzerEngine(nlp_engine=nlp_engine, registry=registry)
     return analyzer
@@ -96,17 +77,21 @@ def anonymizer_engine():
 
 @st.cache_data
 def get_supported_entities(
-    model_family: str, model_path: str, ta_key: str, ta_endpoint: str
+    model_family: str,
+    model_path: str,
 ):
     """Return supported entities from the Analyzer Engine."""
     return analyzer_engine(
-        model_family, model_path, ta_key, ta_endpoint
+        model_family,
+        model_path,
     ).get_supported_entities() + ['GENERIC_PII']
 
 
 @st.cache_data
 def analyze(
-    model_family: str, model_path: str, ta_key: str, ta_endpoint: str, **kwargs
+    model_family: str,
+    model_path: str,
+    **kwargs
 ):
     """Analyze input using Analyzer engine and input arguments (kwargs)."""
     if 'entities' not in kwargs or 'All' in kwargs['entities']:
@@ -126,9 +111,10 @@ def analyze(
             ad_hoc_recognizer] if ad_hoc_recognizer else []
         del kwargs['regex_params']
 
-    return analyzer_engine(model_family, model_path, ta_key, ta_endpoint).analyze(
-        **kwargs
-    )
+    return analyzer_engine(
+        model_family,
+        model_path
+    ).analyze(**kwargs)
 
 
 def anonymize(

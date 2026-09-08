@@ -2,6 +2,8 @@
 Constants for the logmask-ai app
 """
 
+APP_TITLE = 'LogMask-AI'
+
 LOGGER_NAME = 'logmask-ai'
 
 MODEL_HELP_TXT = """
@@ -9,9 +11,9 @@ MODEL_HELP_TXT = """
     It supports multiple NER packages off-the-shelf, such as spaCy, Huggingface, and Stanza.
 """
 
-SAMPLE_TXT = """
+SAMPLE_TXT = """\
 Hi, my name is David Johnson and I'm originally from Liverpool.
-My credit card number is 4095-2609-9393-4932 and my crypto wallet id is 16Yeky6GMjeNkAiNcBY7ZhrLoMSgg1BoyZ.
+My credit card number is 4095-2609-9393-4932 and my crypto wallet id is 166GMjeNkAiNcBY7ZhrLoMSgg1BoyZ.
 
 On 11/10/2024 I visited www.microsoft.com and sent an email to test@presidio.site,  from IP 192.168.0.1.
 
