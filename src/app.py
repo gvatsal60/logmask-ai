@@ -9,14 +9,14 @@ from annotated_text import annotated_text
 from streamlit_tags import st_tags
 
 from helpers import (
-    get_supported_entities,
     analyze,
-    anonymize,
     annotate,
-    analyzer_engine,
+    anonymize,
+    get_supported_entities,
 )
 
 from _const import (
+    APP_TITLE,
     LOGGER_NAME,
     MODEL_HELP_TXT,
     SAMPLE_TXT,
@@ -24,18 +24,14 @@ from _const import (
 
 logger = logging.getLogger(LOGGER_NAME)
 
-TITLE = 'LogMask-AI'
-
 st.set_page_config(
-    page_title=TITLE,
+    page_title=APP_TITLE,
     layout='wide',
     initial_sidebar_state='expanded',
 )
 
 # Sidebar
-st.sidebar.header(TITLE)
-
-ST_TA_KEY = ST_TA_ENDPOINT = ''
+st.sidebar.header(APP_TITLE)
 
 model_list = [
     'spaCy/en_core_web_lg',
@@ -68,7 +64,7 @@ if st_model == 'Other':
 
 st.sidebar.warning('Note: Models might take some time to download.')
 
-analyzer_params = (st_model_package, st_model, ST_TA_KEY, ST_TA_ENDPOINT)
+analyzer_params = (st_model_package, st_model)
 logger.debug('analyzer_params: %s', analyzer_params)
 
 st_operator = st.sidebar.selectbox(
@@ -123,67 +119,115 @@ st_deny_allow_expander = st.sidebar.expander(
 )
 
 with st_deny_allow_expander:
+    if 'allow_list_tags' not in st.session_state:
+        st.session_state['allow_list_tags'] = []
+    if 'deny_list_tags' not in st.session_state:
+        st.session_state['deny_list_tags'] = []
+
     st_allow_list = st_tags(
-        label='Add words to the allowlist', text='Enter word and press enter.'
+        label='Add words to the allowlist',
+        text='Enter word and press enter.',
+        value=st.session_state['allow_list_tags'],
+        key='allow_list_tags_input',
     )
+    st.session_state['allow_list_tags'] = st_allow_list
     st.caption(
         'Allowlists contain words that are not considered PII, but are detected as such.'
     )
 
     st_deny_list = st_tags(
-        label='Add words to the denylist', text='Enter word and press enter.'
+        label='Add words to the denylist',
+        text='Enter word and press enter.',
+        value=st.session_state['deny_list_tags'],
+        key='deny_list_tags_input',
     )
+    st.session_state['deny_list_tags'] = st_deny_list
     st.caption(
         'Denylists contain words that are considered PII, but are not detected as such.'
     )
 
-# Main panel
-analyzer_load_state = st.info('Starting logmask analyzer...')
+TEXT_PANEL_HEIGHT = 485
 
-analyzer_load_state.empty()
+input_mode = st.selectbox(
+    'Input source',
+    options=['Text', 'Upload file'],
+    index=0,
+)
+
+UPLOADED_FILE = None
+if input_mode == 'Upload file':
+    UPLOADED_FILE = st.file_uploader(
+        'Upload a text file',
+        type=['txt', 'log', 'csv', 'json', 'md'],
+    )
 
 # Create two columns for before and after
 col1, col2 = st.columns(2)
-
-# Before:
 col1.subheader('Input')
-st_text = col1.text_area(
-    label='Enter text', value=SAMPLE_TXT, height=400, key='text_input'
-)
+col2.subheader('Output')
+
+ST_TEXT = SAMPLE_TXT
+if input_mode == 'Text':
+    ST_TEXT = col1.text_area(
+        label='Enter text', value=SAMPLE_TXT, height=TEXT_PANEL_HEIGHT, key='text_input'
+    )
+else:
+    if UPLOADED_FILE is not None:
+        file_bytes = UPLOADED_FILE.getvalue()
+        try:
+            ST_TEXT = file_bytes.decode('utf-8')
+        except UnicodeDecodeError:
+            ST_TEXT = file_bytes.decode('latin-1', errors='replace')
+            st.warning('File decoded with latin-1 due to UTF-8 decode issues.')
+    else:
+        ST_TEXT = ''
+
+    # Keep the widget state in sync with the latest uploaded content.
+    st.session_state['uploaded_text_preview'] = ST_TEXT
+
+    col1.text_area(
+        label='Uploaded content',
+        height=TEXT_PANEL_HEIGHT,
+        key='uploaded_text_preview',
+        help='Preview of the uploaded file content used for analysis.',
+        disabled=UPLOADED_FILE is None,
+    )
+    if UPLOADED_FILE is None:
+        col1.caption('Upload a supported file to start analysis.')
 
 try:
+    analyzer_load_state = st.info('Starting logmask analyzer...')
+    supported_entities = get_supported_entities(*analyzer_params)
+    analyzer_load_state.empty()
+
     # Choose entities
     st_entities_expander = st.sidebar.expander('Choose entities to look for')
     st_entities = st_entities_expander.multiselect(
         label='Which entities to look for?',
-        options=get_supported_entities(*analyzer_params),
-        default=list(get_supported_entities(*analyzer_params)),
+        options=supported_entities,
+        default=list(supported_entities),
         help='Limit the list of PII entities detected. '
-        'This list is dynamic and based on the NER model and registered recognizers. ',
+        'This list is dynamic and based on the NER model and registered recognizers.',
     )
 
-    # Before
-    analyzer_load_state = st.info('Starting logmask analyzer...')
-    analyzer = analyzer_engine(*analyzer_params)
-    analyzer_load_state.empty()
-
-    st_analyze_results = analyze(
-        *analyzer_params,
-        text=st_text,
-        entities=st_entities,
-        language='en',
-        score_threshold=st_threshold,
-        return_decision_process=st_return_decision_process,
-        allow_list=st_allow_list,
-        deny_list=st_deny_list,
-    )
+    st_analyze_results = []
+    if ST_TEXT.strip():
+        st_analyze_results = analyze(
+            *analyzer_params,
+            text=ST_TEXT,
+            entities=st_entities,
+            language='en',
+            score_threshold=st_threshold,
+            return_decision_process=st_return_decision_process,
+            allow_list=st_allow_list,
+            deny_list=st_deny_list,
+        )
 
     # After
     if st_operator not in ('highlight', 'synthesize'):
         with col2:
-            st.subheader('Output')
             st_anonymize_results = anonymize(
-                text=st_text,
+                text=ST_TEXT,
                 operator=st_operator,
                 mask_char=ST_MASK_CHAR,
                 number_of_chars=ST_NUM_OF_CHARS,
@@ -191,47 +235,50 @@ try:
                 analyze_results=st_analyze_results,
             )
             st.text_area(
-                label='De-identified', value=st_anonymize_results.text, height=400
+                label='De-identified', value=st_anonymize_results.text, height=TEXT_PANEL_HEIGHT
             )
     else:
-        st.subheader('Highlighted')
-        annotated_tokens = annotate(
-            text=st_text, analyze_results=st_analyze_results)
-        # annotated_tokens
-        annotated_text(*annotated_tokens)
+        with col2:
+            st.caption('Highlighted')
+            annotated_tokens = annotate(
+                text=ST_TEXT, analyze_results=st_analyze_results)
+            annotated_text(*annotated_tokens)
 
     # table result
-    st.subheader(
-        'Findings'
-        if not st_return_decision_process
-        else 'Findings with decision factors'
-    )
-    if st_analyze_results:
-        df = pd.DataFrame.from_records(
-            [r.to_dict() for r in st_analyze_results])
-        df['text'] = [st_text[res.start: res.end]
-                      for res in st_analyze_results]
-
-        df_subset = df[['entity_type', 'text', 'start', 'end', 'score']].rename(
-            {
-                'entity_type': 'Entity type',
-                'text': 'Text',
-                'start': 'Start',
-                'end': 'End',
-                'score': 'Confidence',
-            },
-            axis=1,
+    if ST_TEXT.strip():
+        st.subheader(
+            'Findings'
+            if not st_return_decision_process
+            else 'Findings with decision factors'
         )
-        df_subset['Text'] = [st_text[res.start: res.end]
-                             for res in st_analyze_results]
-        if st_return_decision_process:
-            analysis_explanation_df = pd.DataFrame.from_records(
-                [r.analysis_explanation.to_dict() if r.analysis_explanation is not None else {} for r in st_analyze_results]
+        if st_analyze_results:
+            df = pd.DataFrame.from_records(
+                [r.to_dict() for r in st_analyze_results])
+            df['text'] = [ST_TEXT[res.start: res.end]
+                          for res in st_analyze_results]
+
+            df_subset = df[['entity_type', 'text', 'start', 'end', 'score']].rename(
+                {
+                    'entity_type': 'Entity type',
+                    'text': 'Text',
+                    'start': 'Start',
+                    'end': 'End',
+                    'score': 'Confidence',
+                },
+                axis=1,
             )
-            df_subset = pd.concat([df_subset, analysis_explanation_df], axis=1)
-        st.dataframe(df_subset.reset_index(drop=True))
-    else:
-        st.text('No findings')
+            df_subset['Text'] = [ST_TEXT[res.start: res.end]
+                                 for res in st_analyze_results]
+            if st_return_decision_process:
+                analysis_explanation_df = pd.DataFrame.from_records(
+                    [r.analysis_explanation.to_dict() if r.analysis_explanation is not None else {
+                    } for r in st_analyze_results]
+                )
+                df_subset = pd.concat(
+                    [df_subset, analysis_explanation_df], axis=1)
+            st.dataframe(df_subset.reset_index(drop=True))
+        else:
+            st.text('No findings')
 
 except Exception as e:
     print(e)
