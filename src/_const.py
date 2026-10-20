@@ -2,7 +2,7 @@
 Constants for the logmask-ai app
 """
 
-LOGGER_NAME = 'logmask-ai'
+LOGGER_NAME = "logmask-ai"
 
 MODEL_HELP_TXT = """
     Select which Named Entity Recognition (NER) model to use for PII detection, in parallel to rule-based recognizers.
