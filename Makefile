@@ -1,13 +1,13 @@
+TOP_DIR := $(shell git rev-parse --show-toplevel)
+SRC_DIR := $(TOP_DIR)/src
+
+.PHONY: help all run test clean sync debug add
+
 # Default target
 .DEFAULT_GOAL := help
 
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}' || echo "No annotated targets found."
-
-TOP_DIR := $(shell git rev-parse --show-toplevel)
-SRC_DIR := $(TOP_DIR)/src
-
-.PHONY: help all run test clean sync debug add
 
 all: sync run ## Run sync then start the app
 
