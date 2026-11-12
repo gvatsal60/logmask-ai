@@ -44,7 +44,7 @@ ENV XDG_CACHE_HOME=/tmp/.cache
 COPY pyproject.toml ./
 
 # Install dependencies into a local folder
-RUN uv sync --no-cache --all-extras
+RUN uv sync --no-cache --quiet --all-extras
 
 # Copy source code
 COPY src/ ./

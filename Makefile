@@ -19,7 +19,7 @@ add: ## Add a new package (usage: make add pkg="package_name")
 	@uv add --no-cache $(pkg)
 
 sync: ## Sync project dependencies
-	@uv sync --no-cache --all-extras
+	@uv sync --no-cache --quiet --all-extras
 
 debug: ## Run the app in debug mode with auto-reload
 	@uv run streamlit run "$(SRC_DIR)/app.py" --server.runOnSave true
@@ -32,5 +32,5 @@ test: ## Run the test suite
 	@uv run python -m pytest
 
 clean: ## Clean build artifacts and caches
-	@uv clean
+	@uv clean --quiet --force
 	@rm -rf .venv __pycache__ .mypy_cache
